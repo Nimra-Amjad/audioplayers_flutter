@@ -12,8 +12,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   bool isPlaying = false;
-  late final AudioPlayer player;
-  late final AssetSource path;
+  AudioPlayer? player;
+  AssetSource? path;
 
   Duration _duration = const Duration();
   Duration _position = const Duration();
@@ -26,7 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
-    player.dispose();
+    player!.dispose();
     super.dispose();
   }
 
@@ -35,27 +35,27 @@ class _HomeScreenState extends State<HomeScreen> {
     path = AssetSource('audios/ukulele.mp3');
 
     // set a callback for changing duration
-    player.onDurationChanged.listen((Duration d) {
+    player!.onDurationChanged.listen((Duration d) {
       setState(() => _duration = d);
     });
 
     // set a callback for position change
-    player.onPositionChanged.listen((Duration p) {
+    player!.onPositionChanged.listen((Duration p) {
       setState(() => _position = p);
     });
 
     // set a callback for when audio ends
-    player.onPlayerComplete.listen((_) {
+    player!.onPlayerComplete.listen((_) {
       setState(() => _position = _duration);
     });
   }
 
   void playPause() async {
     if (isPlaying) {
-      player.pause();
+      player!.pause();
       isPlaying = false;
     } else {
-      player.play(path);
+      player!.play(path!);
       isPlaying = true;
     }
     setState(() {});
@@ -75,7 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
             Slider(
               value: _position.inSeconds.toDouble(),
               onChanged: (value) async {
-                await player.seek(Duration(seconds: value.toInt()));
+                await player!.seek(Duration(seconds: value.toInt()));
                 setState(() {});
               },
               min: 0,
@@ -84,8 +84,9 @@ class _HomeScreenState extends State<HomeScreen> {
               activeColor: Colors.red,
             ),
             Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                Text(_position.format()),
                 Text(_duration.format()),
               ],
             ),
@@ -95,7 +96,7 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 InkWell(
                   onTap: () {
-                    player.seek(Duration(seconds: _position.inSeconds - 10));
+                    player!.seek(Duration(seconds: _position.inSeconds - 10));
                     setState(() {});
                   },
                   child: Image.asset('assets/icons/rewind.png'),
@@ -112,7 +113,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(width: 20),
                 InkWell(
                   onTap: () {
-                    player.seek(Duration(seconds: _position.inSeconds + 10));
+                    player!.seek(Duration(seconds: _position.inSeconds + 10));
                     setState(() {});
                   },
                   child: Image.asset('assets/icons/forward.png'),
